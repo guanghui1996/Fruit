@@ -17,10 +17,23 @@ public class SoundController : MonoBehaviour {
     /// 存储 按键点击 特效 胜利失败等游戏音效
     /// </summary>
     [SerializeField]
-    private AudioClip[] SoundClips;
+    private AudioClip[] soundClips;
 
     [SerializeField]
     private AudioSource audioSource;
+
+    public AudioClip[] SoundClips
+    {
+        get
+        {
+            return soundClips;
+        }
+
+        set
+        {
+            soundClips = value;
+        }
+    }
 
     private void Awake()
     {
@@ -44,6 +57,46 @@ public class SoundController : MonoBehaviour {
 
     public void Click() {
         audioSource.PlayOneShot(SoundClips[0]);
+    }
+
+    public void Lose()
+    {
+        audioSource.PlayOneShot(SoundClips[5]);
+    }
+
+    public void Win()
+    {
+        audioSource.PlayOneShot(SoundClips[5]);
+    }
+
+    public void JewelCrash()
+    {
+        audioSource.PlayOneShot(SoundClips[1]);
+    }
+
+    public void LockCrash()
+    {
+        audioSource.PlayOneShot(SoundClips[2]);
+    }
+    public void IceCrash()
+    {
+        audioSource.PlayOneShot(SoundClips[3]);
+    }
+    public void StarIn()
+    {
+        audioSource.PlayOneShot(SoundClips[6]);
+    }
+    public void Fire()
+    {
+        audioSource.PlayOneShot(SoundClips[7]);
+    }
+    public void Gun()
+    {
+        audioSource.PlayOneShot(SoundClips[8]);
+    }
+    public void Boom()
+    {
+        audioSource.PlayOneShot(SoundClips[9]);
     }
 
 }

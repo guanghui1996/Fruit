@@ -47,7 +47,71 @@ public class FruitObj : MonoBehaviour {
         yield return null;
     }
 
+    public void RuleChecker()
+    {
+
+        if (fruit.FruitType != 99)
+        {
+            List<FruitObj> list = Ulti.ListPlus(GetRow(Fruit.FruitPosition, Fruit.FruitType, null),
+                                                      GetCollumn(Fruit.FruitPosition, Fruit.FruitType, null),
+                                                      this);
+
+            if (list.Count >= 3)
+            {
+                listProcess(list);
+                Checked = true;
+            }
+        }
+        else
+        {
+            //GameController.gameController.WinChecker();
+        }
+    }
+
+    void listProcess(List<FruitObj> list)
+    {
+        List<int> _listint = new List<int>();
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (!list[i].Checked)
+                _listint.Add(list[i].getListcount());
+            else
+                _listint.Add(list.Count);
+        }
+        int max = Mathf.Max(_listint.ToArray());
+        int idx = _listint.IndexOf(max);
+        GameController.gameController.FruitProcess(list[idx].getList(), this.gameObject);
+    }
+
+    public int getListcount()
+    {
+        List<FruitObj> list = Ulti.ListPlus(GetRow(Fruit.FruitPosition, Fruit.FruitType, null),
+                                            GetCollumn(Fruit.FruitPosition, Fruit.FruitType, null),
+                                            this);
+
+        return list.Count;
+    }
+
+    public List<FruitObj> getList()
+    {
+        List<FruitObj> list = Ulti.ListPlus(GetRow(Fruit.FruitPosition, Fruit.FruitType, null),
+                                            GetCollumn(Fruit.FruitPosition, Fruit.FruitType, null),
+                                            this);
+
+        return list;
+    }
+
     #region 动画相关
+
+    public void Bounce()
+    {
+        if (GameController.gameController.GameState == (int)Timer.GameState.PLAYING && !Supporter.supporter.IsNoMove)
+        {
+            Animation anim = render.GetComponent<Animation>();
+            anim.enabled = true;
+            anim.Play("bounce");
+        }
+    }
 
     public void FruitDisable()
     {
@@ -76,6 +140,40 @@ public class FruitObj : MonoBehaviour {
             transform.GetChild(0).transform.localEulerAngles = new Vector3(0, 0, 0);
         }
     }
+
+    public void SetBackAnimation(GameObject Obj)
+    {
+        if (!Supporter.supporter.IsNoMove)
+        {
+            Vector2 ObjPos = Obj.GetComponent<FruitObj>().Fruit.FruitPosition;
+            Animation anim = transform.GetChild(0).GetComponent<Animation>();
+            anim.enabled = true;
+
+            if (ObjPos.x == Fruit.FruitPosition.x)
+            {
+                if (ObjPos.y > Fruit.FruitPosition.y)
+                {
+                    anim.Play("MoveBack_Up");
+                }
+                else
+                {
+                    anim.Play("MoveBack_Down");
+                }
+            }
+            else
+            {
+                if (ObjPos.x > Fruit.FruitPosition.x)
+                {
+                    anim.Play("MoveBack_Right");
+                }
+                else
+                {
+                    anim.Play("MoveBack_Left");
+                }
+            }
+        }
+    }
+
     #endregion
 
     #region 相连列表

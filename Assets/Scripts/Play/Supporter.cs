@@ -18,7 +18,7 @@ public class Supporter : MonoBehaviour {
 
     public Vector2[] AvaiableMove;
 
-    FruitObj[] AvaiableObj = new FruitObj[2];
+    FruitObj[] AvailableObj = new FruitObj[2];
 
     private float SP_DELAY = 5f;
 
@@ -31,6 +31,34 @@ public class Supporter : MonoBehaviour {
         supporter = this;
     }
 
+    private void Update()
+    {
+        if (SP_DELAY > 0 && GameController.gameController.GameState == (int)Timer.GameState.PLAYING && !IsNoMove)
+        {
+            SP_DELAY -= Time.deltaTime;
+        }
+        else if (!IsNoMove && GameController.gameController.GameState == (int)Timer.GameState.PLAYING)
+        {
+            RefreshTime();
+            IsNoMoreMove();
+            PlaySuggesttionAnim();
+        }
+    }
+
+    public void RefreshTime()
+    {
+        SP_DELAY = 5f;
+    }
+
+    public void PlaySuggesttionAnim()
+    {
+        if (AvailableObj[0] != null && AvailableObj[1] != null)
+        {
+            AvailableObj[0].FruitSuggesttion();
+            AvailableObj[1].FruitSuggesttion();
+        }
+    }
+
     /// <summary>
     /// 判断当前地图是否还有可以移动的格子
     /// </summary>
@@ -39,7 +67,7 @@ public class Supporter : MonoBehaviour {
     {
         StopSuggesttionAnim();
         AvaiableMove = new Vector2[2];
-        AvaiableObj = new FruitObj[2];
+        AvailableObj = new FruitObj[2];
 
         for (int x = 0; x < 7; x++)
         {
@@ -54,9 +82,9 @@ public class Supporter : MonoBehaviour {
                     if (obj != null)
                     {
                         AvaiableMove[0] = fruit.Fruit.FruitPosition;
-                        AvaiableObj[0] = FruitSpawner.spawn.FruitGridScript[(int)AvaiableMove[0].x, (int)AvaiableMove[0].y];
+                        AvailableObj[0] = FruitSpawner.spawn.FruitGridScript[(int)AvaiableMove[0].x, (int)AvaiableMove[0].y];
                         AvaiableMove[1] = obj.Fruit.FruitPosition;
-                        AvaiableObj[1] = FruitSpawner.spawn.FruitGridScript[(int)AvaiableMove[1].x, (int)AvaiableMove[1].y];
+                        AvailableObj[1] = FruitSpawner.spawn.FruitGridScript[(int)AvaiableMove[1].x, (int)AvaiableMove[1].y];
                         isNoMove = false;
                         return true;
                     }
@@ -116,13 +144,13 @@ public class Supporter : MonoBehaviour {
 
     public void StopSuggesttionAnim()
     {
-        if (AvaiableObj[0] != null)
+        if (AvailableObj[0] != null)
         {
-            AvaiableObj[0].FruitStopSuggesttion();
+            AvailableObj[0].FruitStopSuggesttion();
         }
-        if (AvaiableObj[1] != null)
+        if (AvailableObj[1] != null)
         {
-            AvaiableObj[1].FruitStopSuggesttion();
+            AvailableObj[1].FruitStopSuggesttion();
         }
     }
 

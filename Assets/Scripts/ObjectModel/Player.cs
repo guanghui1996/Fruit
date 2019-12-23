@@ -16,8 +16,23 @@ public class Player
     public string Name;
     public bool Locked;
     public int Stars;
-    public int HightScore;
+    private int hightScore;
     public int Background;
+
+    public int HightScore
+    {
+        get
+        {
+            return hightScore;
+        }
+
+        set
+        {
+            if(value > hightScore)
+                hightScore = value;
+        }
+    }
+
     public string ToSaveString() {
         string s = Locked + "," + Stars + "," + HightScore +  "," + Background + ",";
         return s;

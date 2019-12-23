@@ -14,7 +14,7 @@ public class FruitSpawner : MonoBehaviour {
     public static FruitSpawner spawn;
 
     [SerializeField]
-    private GameObject[,] FruitGrid;
+    private GameObject[,] fruitGrid;
 
     [SerializeField]
     private FruitObj[,] fruitGridScript;
@@ -61,6 +61,19 @@ public class FruitSpawner : MonoBehaviour {
         set
         {
             fruitGridScript = value;
+        }
+    }
+
+    public GameObject[,] FruitGrid
+    {
+        get
+        {
+            return fruitGrid;
+        }
+
+        set
+        {
+            fruitGrid = value;
         }
     }
 
