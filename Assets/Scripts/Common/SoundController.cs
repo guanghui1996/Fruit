@@ -69,7 +69,7 @@ public class SoundController : MonoBehaviour {
         audioSource.PlayOneShot(SoundClips[5]);
     }
 
-    public void JewelCrash()
+    public void FruitCrash()
     {
         audioSource.PlayOneShot(SoundClips[1]);
     }

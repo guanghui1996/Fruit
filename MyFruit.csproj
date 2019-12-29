@@ -122,8 +122,10 @@
     <Compile Include="Assets\Scripts\ObjectModel\FruitObj.cs" />
     <Compile Include="Assets\Scripts\ObjectModel\Player.cs" />
     <Compile Include="Assets\Scripts\ObjectModel\PlayerInfo.cs" />
+    <Compile Include="Assets\Scripts\Play\EffectSpawner.cs" />
     <Compile Include="Assets\Scripts\Play\FruitSpawner.cs" />
     <Compile Include="Assets\Scripts\Play\GridManager.cs" />
+    <Compile Include="Assets\Scripts\Play\SpawnController.cs" />
     <Compile Include="Assets\Scripts\Play\Supporter.cs" />
     <Compile Include="Assets\Scripts\Play\Timer.cs" />
   </ItemGroup>

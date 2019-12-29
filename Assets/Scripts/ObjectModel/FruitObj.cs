@@ -36,6 +36,22 @@ public class FruitObj : MonoBehaviour {
         StartCoroutine(_Destroy());
     }
 
+    public void RuleChecker()
+    {
+        if (Fruit.FruitType != 99)
+        {
+            List<FruitObj> list = Ulti.ListPlus(GetRow(Fruit.FruitPosition, Fruit.FruitType, null), GetCollumn(Fruit.FruitPosition, Fruit.FruitType, null), this);
+            if (list.Count >= 3)
+            {
+                listProcess(list);
+                Checked = true;
+            }
+            else
+            {
+                GameController.gameController.WinChecker();
+            }
+        }
+    }
 
     private void RemoveFromList(int x, int y)
     {
@@ -44,27 +60,55 @@ public class FruitObj : MonoBehaviour {
 
     IEnumerator _Destroy()
     {
-        yield return null;
+        GridManager.grid.GridCellObj[(int)Fruit.FruitPosition.x, (int)Fruit.FruitPosition.y].CelltypeProcess();
+
+
+        yield return new WaitForSeconds(DELAY);
+        if (Fruit.FruitPower > 0)
+        {
+            Debug.Log("消失特效");
+        }
+        GameController.gameController.Drop.DELAY = GameController.DROP_DELAY;
+        FruitCrash();
+        yield return new WaitForEndOfFrame();
+
+
+        StopAllCoroutines();
+        Destroy(gameObject);
     }
 
-    public void RuleChecker()
+    void FruitCrash()
     {
+        int x = (int)Fruit.FruitPosition.x;
+        int y = (int)Fruit.FruitPosition.y;
 
-        if (fruit.FruitType != 99)
-        {
-            List<FruitObj> list = Ulti.ListPlus(GetRow(Fruit.FruitPosition, Fruit.FruitType, null),
-                                                      GetCollumn(Fruit.FruitPosition, Fruit.FruitType, null),
-                                                      this);
+        //特效
+    }
 
-            if (list.Count >= 3)
-            {
-                listProcess(list);
-                Checked = true;
-            }
-        }
-        else
+    /// <summary>
+    /// 获取新位置  并进行下落动画
+    /// </summary>
+    public void getNewPosition()
+    {
+        int newpos = (int)Fruit.FruitPosition.y;
+        int x = (int)Fruit.FruitPosition.x;
+        int oldpos = (int)Fruit.FruitPosition.y;
+
+        for (int y = newpos; y >= 0; y--)
         {
-            //GameController.gameController.WinChecker();
+            if (GridManager.grid.Map[x, y] != 0 && GridManager.grid.GridCellObj[x, y].Cell.CellEffect != 4 && FruitSpawner.spawn.FruitGridScript[x, y] == null)
+                newpos = y;
+            else if (GridManager.grid.Map[x, y] != 0 && GridManager.grid.GridCellObj[x, y].Cell.CellEffect == 4)
+                break;
+
+            FruitSpawner.spawn.FruitGridScript[x, (int)Fruit.FruitPosition.y] = null;
+            FruitSpawner.spawn.FruitGrid[x, (int)Fruit.FruitPosition.y] = null;
+
+            Fruit.FruitPosition = new Vector2(x, newpos);
+            FruitSpawner.spawn.FruitGridScript[x, newpos] = this;
+            FruitSpawner.spawn.FruitGrid[x, newpos] = this.gameObject;
+            if (oldpos != newpos)
+                StartCoroutine(Ulti.IEDrop(this.gameObject, Fruit.FruitPosition, GameController.DROP_SPEED));
         }
     }
 
@@ -100,6 +144,29 @@ public class FruitObj : MonoBehaviour {
 
         return list;
     }
+
+
+    void PowerProcess(int power)
+    {
+        switch (power)
+        {
+            case 1:
+                
+                break;
+            case 2:
+
+                break;
+            case 3:
+
+                break;
+            case 4:
+
+                break;
+            default:
+                break;
+        }
+    }
+
 
     #region 动画相关
 

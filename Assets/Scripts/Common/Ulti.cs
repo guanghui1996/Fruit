@@ -19,6 +19,8 @@ public class Ulti : MonoBehaviour
         {
             tmp.Add(l1[i]);
         }
+        if (bonus != null)
+            tmp.Add(bonus);
         for (int i = 0; i < l2.Count; i++)
         {
             tmp.Add(l2[i]);
@@ -103,6 +105,13 @@ public class Ulti : MonoBehaviour
         anim.Play("Moveto");
         Destroy(animclip, duration);
     }
+    /// <summary>
+    /// 下落动画
+    /// </summary>
+    /// <param name="obj">下落的物体</param>
+    /// <param name="NewPos">下落的目标位置</param>
+    /// <param name="speed">下落速度</param>
+    /// <returns></returns>
     public static IEnumerator IEDrop(GameObject obj, Vector2 NewPos, float speed)
     {
         FruitObj script = obj.GetComponent<FruitObj>();
