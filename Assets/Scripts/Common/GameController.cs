@@ -369,7 +369,7 @@ public class GameController : MonoBehaviour {
         SoundController.Sound.FruitCrash();
         foreach (var item in list)
         {
-            item.Destroy();
+            item.ReGroup(pos);
         }
         StartCoroutine(SpawnFruitPower(type, power, pos));
     }
@@ -415,7 +415,7 @@ public class GameController : MonoBehaviour {
     {
         List<Vector2> listpos = new List<Vector2>();
         Vector2 pos;
-        for (int y = 9-1; y >= 0; y++)
+        for (int y = 9 - 1; y >= 0; y--)
         {
             for (int x = 0; x < 7; x++)
             {

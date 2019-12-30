@@ -126,7 +126,7 @@ public class Timer : MonoBehaviour {
     /// 分数进度条
     /// </summary>
     /// <param name="score"></param>
-    void ScoreBarProcess(int score)
+    public void ScoreBarProcess(int score)
     {
         ScoreStack += score;
         if (!startPlus)
@@ -134,6 +134,16 @@ public class Timer : MonoBehaviour {
             StartPlus = true;
             StartCoroutine(IEScoreBarProcess());
         }
+    }
+
+    /// <summary>
+    /// 升级
+    /// </summary>
+    public void ClassicLvUp()
+    {
+        GameController.gameController.GameState = (int)GameState.WIN;
+        NoSelect.SetActive(false);
+        StartCoroutine(UpLevel());
     }
 
     #region 按键
@@ -302,6 +312,18 @@ public class Timer : MonoBehaviour {
             yield return null;
         }
         StartPlus = false;
+    }
+
+    /// <summary>
+    /// 升级 进入下一关卡
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator UpLevel()
+    {
+        DisableFruits(true);
+        showFullAds();
+        yield return new WaitForSeconds(1f);
+        ButtonActionController.Click.ClassicScene(PlayerInfo.MapPlayer.Level + 1);
     }
 
     IEnumerator AdsCd()

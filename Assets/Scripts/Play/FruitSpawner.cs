@@ -265,6 +265,7 @@ public class FruitSpawner : MonoBehaviour {
         FruitGrid[(int)pos.x, (int)pos.y] = tmp;
         GameController.gameController.FruitStar = FruitScript;
 
+        StarEffect.SetActive(true);
     }
 
     public IEnumerator ReSpawn()

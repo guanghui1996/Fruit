@@ -30,11 +30,7 @@ public class FruitObj : MonoBehaviour {
         anim = Render.GetComponent<Animation>();
     }
 
-    public void Destroy()
-    {
-        RemoveFromList((int)Fruit.FruitPosition.x, (int)Fruit.FruitPosition.y);
-        StartCoroutine(_Destroy());
-    }
+    
 
     public void RuleChecker()
     {
@@ -55,13 +51,39 @@ public class FruitObj : MonoBehaviour {
 
     private void RemoveFromList(int x, int y)
     {
+        FruitSpawner.spawn.FruitGridScript[x, y] = null;
+        FruitSpawner.spawn.FruitGrid[x, y] = null;
+        GetComponent<Collider2D>().enabled = false;
+    }
 
+    /// <summary>
+    /// 移动并销毁Fruit
+    /// </summary>
+    /// <param name="pos"></param>
+    public void ReGroup(Vector2 pos)
+    {
+        StartCoroutine(_ReGroup(pos));
+    }
+
+    IEnumerator _ReGroup(Vector2 pos)
+    {
+        RemoveFromList((int)Fruit.FruitPosition.x, (int)Fruit.FruitPosition.y);
+        yield return new WaitForSeconds(DELAY - 0.015f);
+        Ulti.MoveTo(this.gameObject, pos, DELAY);
+
+        StartCoroutine(_Destroy());
+    }
+
+    public void Destroy()
+    {
+        RemoveFromList((int)Fruit.FruitPosition.x, (int)Fruit.FruitPosition.y);
+        StartCoroutine(_Destroy());
     }
 
     IEnumerator _Destroy()
     {
         GridManager.grid.GridCellObj[(int)Fruit.FruitPosition.x, (int)Fruit.FruitPosition.y].CelltypeProcess();
-
+        
 
         yield return new WaitForSeconds(DELAY);
         if (Fruit.FruitPower > 0)

@@ -29,7 +29,7 @@ public class SpawnController : MonoBehaviour {
         yield return new WaitForEndOfFrame();
         Spawn();
         BonusPower();
-        //ShowStar();
+        ShowStar();
     }
 
 
