@@ -108,7 +108,6 @@
     <Compile Include="Assets\Scripts\Common\SoundController.cs" />
     <Compile Include="Assets\Scripts\Common\Ulti.cs" />
     <Compile Include="Assets\Scripts\Home\Home.cs" />
-    <Compile Include="Assets\Scripts\Home\Map.cs" />
     <Compile Include="Assets\Scripts\Home\SoundMusicButtonCtrl.cs" />
     <Compile Include="Assets\Scripts\Libs\AdmobGA.cs" />
     <Compile Include="Assets\Scripts\Libs\Ads.cs" />
@@ -116,6 +115,7 @@
     <Compile Include="Assets\Scripts\Loading\LoadWaiting.cs" />
     <Compile Include="Assets\Scripts\Map\CameraMovement.cs" />
     <Compile Include="Assets\Scripts\Map\DataLoader.cs" />
+    <Compile Include="Assets\Scripts\Map\Map.cs" />
     <Compile Include="Assets\Scripts\ObjectModel\Cell.cs" />
     <Compile Include="Assets\Scripts\ObjectModel\CellObj.cs" />
     <Compile Include="Assets\Scripts\ObjectModel\Fruit.cs" />

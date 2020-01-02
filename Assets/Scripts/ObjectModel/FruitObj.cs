@@ -30,8 +30,11 @@ public class FruitObj : MonoBehaviour {
         anim = Render.GetComponent<Animation>();
     }
 
-    
+    #region 游戏控制
 
+    /// <summary>
+    /// 游戏算法规则检查
+    /// </summary>
     public void RuleChecker()
     {
         if (Fruit.FruitType != 99)
@@ -49,6 +52,11 @@ public class FruitObj : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// 将消除的水果从队列中删除
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
     private void RemoveFromList(int x, int y)
     {
         FruitSpawner.spawn.FruitGridScript[x, y] = null;
@@ -65,46 +73,24 @@ public class FruitObj : MonoBehaviour {
         StartCoroutine(_ReGroup(pos));
     }
 
-    IEnumerator _ReGroup(Vector2 pos)
-    {
-        RemoveFromList((int)Fruit.FruitPosition.x, (int)Fruit.FruitPosition.y);
-        yield return new WaitForSeconds(DELAY - 0.015f);
-        Ulti.MoveTo(this.gameObject, pos, DELAY);
-
-        StartCoroutine(_Destroy());
-    }
-
     public void Destroy()
     {
         RemoveFromList((int)Fruit.FruitPosition.x, (int)Fruit.FruitPosition.y);
         StartCoroutine(_Destroy());
     }
 
-    IEnumerator _Destroy()
-    {
-        GridManager.grid.GridCellObj[(int)Fruit.FruitPosition.x, (int)Fruit.FruitPosition.y].CelltypeProcess();
-        
-
-        yield return new WaitForSeconds(DELAY);
-        if (Fruit.FruitPower > 0)
-        {
-            Debug.Log("消失特效");
-        }
-        GameController.gameController.Drop.DELAY = GameController.DROP_DELAY;
-        FruitCrash();
-        yield return new WaitForEndOfFrame();
-
-
-        StopAllCoroutines();
-        Destroy(gameObject);
-    }
-
+    /// <summary>
+    /// 水果消除
+    /// </summary>
     void FruitCrash()
     {
         int x = (int)Fruit.FruitPosition.x;
         int y = (int)Fruit.FruitPosition.y;
 
         //特效
+        EffectSpawner.effect.FruitCrashArray[x, y].transform.position = new Vector3(transform.position.x, transform.position.y, -0.2f);
+        EffectSpawner.effect.FruitCrashArray[x, y].SetActive(false);
+        EffectSpawner.effect.FruitCrashArray[x, y].SetActive(true);
     }
 
     /// <summary>
@@ -166,23 +152,30 @@ public class FruitObj : MonoBehaviour {
 
         return list;
     }
+    #endregion
 
-
+    /// <summary>
+    /// 道具相关功能实现
+    /// </summary>
+    /// <param name="power"></param>
     void PowerProcess(int power)
     {
         switch (power)
         {
             case 1:
-                
+                GameController.gameController.PBoom((int)Fruit.FruitPosition.x, (int)Fruit.FruitPosition.y);
+                EffectSpawner.effect.Boom(this.gameObject.transform.position);
                 break;
             case 2:
-
+                EffectSpawner.effect.FireArrow(transform.position, false);
+                GameController.gameController.PDestroyRow((int)Fruit.FruitPosition.x, (int)Fruit.FruitPosition.y);
                 break;
             case 3:
-
+                EffectSpawner.effect.FireArrow(transform.position, true);
+                GameController.gameController.PDestroyCollumn((int)Fruit.FruitPosition.x, (int)Fruit.FruitPosition.y);
                 break;
             case 4:
-
+                GameController.gameController.PBonusTime();
                 break;
             default:
                 break;
@@ -361,6 +354,41 @@ public class FruitObj : MonoBehaviour {
     }
     #endregion
 
+    #region 协程
+    IEnumerator _ReGroup(Vector2 pos)
+    {
+        RemoveFromList((int)Fruit.FruitPosition.x, (int)Fruit.FruitPosition.y);
+        yield return new WaitForSeconds(DELAY - 0.015f);
+        Ulti.MoveTo(this.gameObject, pos, DELAY);
+
+        StartCoroutine(_Destroy());
+    }
+
+    /// <summary>
+    /// 消除
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator _Destroy()
+    {
+        GridManager.grid.GridCellObj[(int)Fruit.FruitPosition.x, (int)Fruit.FruitPosition.y].CelltypeProcess();
+        GameController.gameController.CellRemoveEffect((int)Fruit.FruitPosition.x, (int)Fruit.FruitPosition.y);
+        yield return new WaitForSeconds(DELAY);
+        if (Fruit.FruitPower > 0)
+        {
+            PowerProcess(Fruit.FruitPower);
+        }
+        GameController.gameController.Drop.DELAY = GameController.DROP_DELAY;
+        FruitCrash();
+        yield return new WaitForEndOfFrame();
+        EffectSpawner.effect.ScoreInc(this.gameObject.transform.position);
+        yield return new WaitForEndOfFrame();
+        EffectSpawner.effect.ContinueCombo();
+        yield return new WaitForEndOfFrame();
+        Supporter.supporter.RefreshTime();
+        StopAllCoroutines();
+        Destroy(gameObject);
+    }
+    #endregion
 
     #region 属性
     public Fruit Fruit

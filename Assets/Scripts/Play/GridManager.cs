@@ -114,12 +114,17 @@ public class GridManager : MonoBehaviour {
                 if (map[x, y] > 0) {
                     CellInstantiate(x, y, map[x, y]);
                 }
-
+                EffectSpawner.effect.FruitCrashArray[x, y] = EffectSpawner.effect.FruitCrash(new Vector3(x, y));
             }
         }
     }
 
-
+    /// <summary>
+    /// 底层单元格生成
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="type"></param>
     void CellInstantiate(int x, int y, int type)
     {
         ObjTmp = Instantiate(CellPrefab) as GameObject;
@@ -133,7 +138,13 @@ public class GridManager : MonoBehaviour {
         GridCellObj[x, y] = cellScript;
     }
 
-    
+    /// <summary>
+    /// 地图单元格设置
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <returns></returns>
     Cell SetCell(int type, int x, int y)
     {
         Cell tcell = new Cell();

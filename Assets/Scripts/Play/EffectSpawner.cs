@@ -107,6 +107,19 @@ public class EffectSpawner : MonoBehaviour {
     }
 
     /// <summary>
+    /// 为水果添加消除的动画效果
+    /// </summary>
+    /// <param name="pos"></param>
+    /// <returns></returns>
+    public GameObject FruitCrash(Vector3 pos)
+    {
+        GameObject tmp = Instantiate(EffectPrefabs[0]) as GameObject;
+        tmp.transform.SetParent(FruitCrashParent.transform, false);
+        tmp.transform.localPosition = new Vector3(pos.x, pos.y, -0.2f);
+        return tmp;
+    }
+
+    /// <summary>
     /// 分数自增
     /// </summary>
     /// <param name="pos"></param>
@@ -425,7 +438,7 @@ public class EffectSpawner : MonoBehaviour {
     }
 
     /// <summary>
-    /// 连击消灭标记
+    /// 连击标记
     /// </summary>
     /// <returns></returns>
     public IEnumerator ComboTick()

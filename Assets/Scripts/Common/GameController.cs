@@ -68,8 +68,7 @@ public class GameController : MonoBehaviour {
             StartCoroutine(GridManager.grid.GridMapCreate("classic"));
         }
         yield return new WaitForSeconds(1.5f);
-
-
+        StartCoroutine(EffectSpawner.effect.ComboTick());
         Timer.timer.TimeTick(true);
         GameState = (int)Timer.GameState.PLAYING;
         NoSelector.SetActive(false);
@@ -80,6 +79,8 @@ public class GameController : MonoBehaviour {
         FruitSelecter();
         
     }
+
+    #region 游戏规则内控制
 
     /// <summary>
     /// 水果选择
@@ -191,6 +192,11 @@ public class GameController : MonoBehaviour {
         return null;
     }
 
+    /// <summary>
+    /// 交换水果位置
+    /// </summary>
+    /// <param name="fruit1"></param>
+    /// <param name="fruit2"></param>
     void SwapFruitPosition(GameObject fruit1, GameObject fruit2)
     {
         FruitObj tmp1 = fruit1.GetComponent<FruitObj>();
@@ -299,6 +305,7 @@ public class GameController : MonoBehaviour {
         if (c == 3)
         {
             DestroyFruit(list);
+            EffectSpawner.effect.ComboInc();
             dropFruit();
             return false;
         }
@@ -306,16 +313,20 @@ public class GameController : MonoBehaviour {
         {
             ReGroup(list, type, (int)Power.BOOM, v);
             DestroyRandom();
+            EffectSpawner.effect.ComboInc();
             dropFruit();
         }
-        else if (c == 6)
+        else if (c >= 5)
         {
             ReGroup(list, 8, (int)Power.MAGIC, v);
-
+            EffectSpawner.effect.ComboInc();
+            DestroyRandom();
+            DestroyRandom();
             dropFruit();
         }
         return true;
     }
+    #endregion
 
     public void PDestroyType(int type, Vector3 pos)
     {
@@ -325,6 +336,7 @@ public class GameController : MonoBehaviour {
     void DestroyFruit(List<FruitObj> list)
     {
         SoundController.Sound.FruitCrash();
+        EffectSpawner.effect.Glass();
         foreach (var item in list)
         {
             item.Destroy();
@@ -344,7 +356,7 @@ public class GameController : MonoBehaviour {
                 {
                     CellObj tmp = listeff[Random.Range(0, listeff.Count)];
                     tmp.RemoveEffect();
-
+                    EffectSpawner.effect.Thunder(GridManager.grid.GridCell[(int)tmp.Cell.CellPosition.x, (int)tmp.Cell.CellPosition.y].transform.position);
                 }
                 else
                 {
@@ -358,7 +370,7 @@ public class GameController : MonoBehaviour {
                 if (tmp != null && tmp != FruitStar)
                 {
                     tmp.Destroy();
-
+                    EffectSpawner.effect.Thunder(GridManager.grid.GridCell[(int)tmp.Fruit.FruitPosition.x, (int)tmp.Fruit.FruitPosition.y].transform.position);
                 }
             }
         }
@@ -367,6 +379,7 @@ public class GameController : MonoBehaviour {
     void ReGroup(List<FruitObj> list, int type, int power, Vector2 pos)
     {
         SoundController.Sound.FruitCrash();
+        EffectSpawner.effect.Glass();
         foreach (var item in list)
         {
             item.ReGroup(pos);
@@ -374,6 +387,10 @@ public class GameController : MonoBehaviour {
         StartCoroutine(SpawnFruitPower(type, power, pos));
     }
 
+    /// <summary>
+    /// 获取单元格属性
+    /// </summary>
+    /// <returns></returns>
     private List<CellObj> getListCellEffect()
     {
         List<CellObj> tmp = new List<CellObj>();
@@ -390,80 +407,9 @@ public class GameController : MonoBehaviour {
         return tmp;
     }
 
-    public void AddBonusPower()
-    {
-        int dem = 0;
-        while (true)
-        {
-            dem++;
-            if (dem >= 63)
-                return;
-            int x = Random.Range(0, 7);
-            int y = Random.Range(0, 9);
-            FruitObj tmp = FruitSpawner.spawn.FruitGridScript[x, y];
-            if (tmp != null && tmp.Fruit.FruitType != 8 && tmp.Fruit.fruitPower == 0 && GridManager.grid.GridCellObj[x, y].Cell.CellEffect == 0)
-            {
-                int r = Random.Range(2, 4);
-                tmp.Fruit.FruitPower = r;
-
-                return;
-            }
-        }
-    }
-
-    public void ShowStar()
-    {
-        List<Vector2> listpos = new List<Vector2>();
-        Vector2 pos;
-        for (int y = 9 - 1; y >= 0; y--)
-        {
-            for (int x = 0; x < 7; x++)
-            {
-                if (GridManager.grid.GridCellObj[x, y] != null)
-                    listpos.Add(new Vector2(x, y));
-            }
-            if (listpos.Count > 0)
-                break;
-        }
-        pos = listpos[Random.Range(0, listpos.Count)];
-        FruitSpawner.spawn.SpawnStar(pos);
-        SoundController.Sound.StarIn();
-    }
-
-    IEnumerator DestroyType(int type, Vector3 pos)
-    {
-        NoSelector.SetActive(true);
-        dropFruit();
-        for (int x = 0; x < 7; x++)
-        {
-            for (int y = 0; y < 9; y++)
-            {
-                FruitObj tmp = FruitSpawner.spawn.FruitGridScript[x, y];
-                if (tmp != null && tmp.Fruit.FruitType == type)
-                {
-                    //生成特效
-                    tmp.Destroy();
-                }
-            }
-        }
-        yield return new WaitForSeconds(0.2f);
-        NoSelector.SetActive(false);
-    }
-
-    IEnumerator SpawnFruitPower(int type, int power, Vector2 pos)
-    {
-        yield return new WaitForSeconds(0.4f);
-        //GameObject tmp = FruitSpawner.spawn.SpawnFruitPower(type, power, pos);
-        //yield return new WaitForSeconds(0.2f);
-        //tmp.GetComponent<Collider2D>().enabled = true;
-    }
-
-    void dropFruit()
-    {
-        Drop.DELAY = DROP_DELAY;
-        Drop.enabled = true;
-    }
-
+    /// <summary>
+    /// 删除随机非空单元上物体
+    /// </summary>
     private void destroyNotEmpty()
     {
         try
@@ -475,7 +421,7 @@ public class GameController : MonoBehaviour {
                 if (FruitSpawner.spawn.FruitGridScript[(int)tmp.x, (int)tmp.y] != null)
                 {
                     FruitSpawner.spawn.FruitGridScript[(int)tmp.x, (int)tmp.y].Destroy();
-                    
+                    EffectSpawner.effect.Thunder(GridManager.grid.GridCellObj[(int)tmp.x, (int)tmp.y].transform.position);
                 }
             }
         }
@@ -485,6 +431,10 @@ public class GameController : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// 获取非空单元列表
+    /// </summary>
+    /// <returns></returns>
     private List<CellObj> getcListNotEmpty()
     {
         List<CellObj> tmp = new List<CellObj>();
@@ -521,6 +471,239 @@ public class GameController : MonoBehaviour {
             return new Vector2(x, y);
         }
     }
+
+    #region 特效相关
+
+    /// <summary>
+    /// 控制水果下落
+    /// </summary>
+    void dropFruit()
+    {
+        Drop.DELAY = DROP_DELAY;
+        Drop.enabled = true;
+    }
+
+    /// <summary>
+    /// 随机奖励
+    /// </summary>
+    public void AddBonusPower()
+    {
+        int dem = 0;
+        while (true)
+        {
+            dem++;
+            if (dem >= 63)
+                return;
+            int x = Random.Range(0, 7);
+            int y = Random.Range(0, 9);
+            FruitObj tmp = FruitSpawner.spawn.FruitGridScript[x, y];
+            if (tmp != null && tmp.Fruit.FruitType != 8 && tmp.Fruit.fruitPower == 0 && GridManager.grid.GridCellObj[x, y].Cell.CellEffect == 0)
+            {
+                int r = Random.Range(2, 4);
+                tmp.Fruit.FruitPower = r;
+                EffectSpawner.effect.ThunderRow(FruitSpawner.spawn.FruitGrid[x, y], r);
+                return;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 爆炸消除
+    /// </summary>
+    public void PBoom(int x, int y)
+    {
+        dropFruit();
+        SoundController.Sound.Boom();
+        for (int i = x - 1; i <= x + 1; i++)
+        {
+            for (int j = y - 1; j <= y + 1; j++)
+            {
+                if (i != x || j != y)
+                {
+                    if (i >= 0 && i < 7 && j >= 0 && j < 9 && FruitSpawner.spawn.FruitGridScript[i, j] != null && FruitSpawner.spawn.FruitGridScript[i, j].Fruit.FruitType != 99)
+                    {
+                        FruitSpawner.spawn.FruitGridScript[i, j].Destroy();
+                    }
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 消除行
+    /// </summary>
+    /// <param name="_x"></param>
+    /// <param name="_y"></param>
+    public void PDestroyRow(int _x, int y)
+    {
+        dropFruit();
+        SoundController.Sound.Fire();
+        List<CellObj> cellEffect = new List<CellObj>();
+        List<FruitObj> fruitObjs = new List<FruitObj>();
+        for (int x = 0; x < 7; x++)
+        {
+            if (x != _x)
+            {
+                if (GridManager.grid.GridCellObj[x, y] != null && GridManager.grid.GridCellObj[x, y].Cell.CellEffect > 0)
+                {
+                    cellEffect.Add(GridManager.grid.GridCellObj[x, y]);
+                }
+                if (FruitSpawner.spawn.FruitGridScript[x, y] != null && FruitSpawner.spawn.FruitGridScript[x, y].Fruit.FruitType != 99 && GridManager.grid.GridCellObj[x, y].Cell.CellEffect == 0)
+                {
+                    fruitObjs.Add(FruitSpawner.spawn.FruitGridScript[x, y]);
+                }
+            }
+
+            foreach (CellObj item in cellEffect)
+            {
+                item.RemoveEffect();
+            }
+            foreach (FruitObj item in fruitObjs)
+            {
+                item.Destroy();
+            }
+        }
+    }
+
+    /// <summary>
+    /// 消除列
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="_y"></param>
+    public void PDestroyCollumn(int x, int _y)
+    {
+        dropFruit();
+        SoundController.Sound.Fire();
+        List<CellObj> cellEffect = new List<CellObj>();
+        List<FruitObj> fruitObjs = new List<FruitObj>();
+        for (int y = 0; y < 9; y++)
+        {
+            if (y != _y)
+            {
+                if (GridManager.grid.GridCellObj[x, y] != null && GridManager.grid.GridCellObj[x, y].Cell.CellEffect > 0)
+                {
+                    cellEffect.Add(GridManager.grid.GridCellObj[x, y]);
+                }
+                if (FruitSpawner.spawn.FruitGridScript[x, y] != null && FruitSpawner.spawn.FruitGridScript[x, y].Fruit.FruitType != 99 && GridManager.grid.GridCellObj[x, y].Cell.CellEffect == 0)
+                {
+                    fruitObjs.Add(FruitSpawner.spawn.FruitGridScript[x, y]);
+                }
+            }
+
+            foreach (CellObj item in cellEffect)
+            {
+                item.RemoveEffect();
+            }
+            foreach (FruitObj item in fruitObjs)
+            {
+                item.Destroy();
+            }
+        }
+    }
+
+    /// <summary>
+    /// 移除特效
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    public void CellRemoveEffect(int x, int y)
+    {
+        if (x - 1 >= 0 && GridManager.grid.GridCellObj[x - 1, y] != null)
+            GridManager.grid.GridCellObj[x - 1, y].RemoveEffect();
+        if (x + 1 < 7 && GridManager.grid.GridCellObj[x + 1, y] != null)
+            GridManager.grid.GridCellObj[x + 1, y].RemoveEffect();
+        if (y - 1 >= 0 && GridManager.grid.GridCellObj[x, y - 1] != null)
+            GridManager.grid.GridCellObj[x, y - 1].RemoveEffect();
+        if (y + 1 < 9 && GridManager.grid.GridCellObj[x, y + 1] != null)
+            GridManager.grid.GridCellObj[x, y + 1].RemoveEffect();
+    }
+
+    /// <summary>
+    /// 时间道具
+    /// </summary>
+    public void PBonusTime()
+    {
+        StartCoroutine(TimeInc());
+    }
+    #endregion
+
+    /// <summary>
+    /// 星星显示
+    /// </summary>
+    public void ShowStar()
+    {
+        List<Vector2> listpos = new List<Vector2>();
+        Vector2 pos;
+        for (int y = 9 - 1; y >= 0; y--)
+        {
+            for (int x = 0; x < 7; x++)
+            {
+                if (GridManager.grid.GridCellObj[x, y] != null)
+                    listpos.Add(new Vector2(x, y));
+            }
+            if (listpos.Count > 0)
+                break;
+        }
+        pos = listpos[Random.Range(0, listpos.Count)];
+        FruitSpawner.spawn.SpawnStar(pos);
+        SoundController.Sound.StarIn();
+    }
+
+
+    /// <summary>
+    /// 时间增加
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator TimeInc()
+    {
+        int dem = 0;
+        int t = 22;
+        while (t > 0)
+        {
+            dem++;
+            Timer.timer.GameTime += 1;
+            if (Timer.timer.GameTime >= 270f)
+            {
+                Timer.timer.GameTime = 270f;
+                break;
+            }
+            t -= 1;
+            yield return null;
+            if (dem >= 270) break;
+        }
+    }
+
+    IEnumerator DestroyType(int type, Vector3 pos)
+    {
+        NoSelector.SetActive(true);
+        dropFruit();
+        for (int x = 0; x < 7; x++)
+        {
+            for (int y = 0; y < 9; y++)
+            {
+                FruitObj tmp = FruitSpawner.spawn.FruitGridScript[x, y];
+                if (tmp != null && tmp.Fruit.FruitType == type)
+                {
+                    //生成特效
+                    tmp.Destroy();
+                }
+            }
+        }
+        yield return new WaitForSeconds(0.2f);
+        NoSelector.SetActive(false);
+    }
+
+    IEnumerator SpawnFruitPower(int type, int power, Vector2 pos)
+    {
+        yield return new WaitForSeconds(0.4f);
+        //GameObject tmp = FruitSpawner.spawn.SpawnFruitPower(type, power, pos);
+        //yield return new WaitForSeconds(0.2f);
+        //tmp.GetComponent<Collider2D>().enabled = true;
+    }
+
+
+
+ 
 
 
     #region 属性
