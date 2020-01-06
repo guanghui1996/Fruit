@@ -307,7 +307,7 @@ public class EffectSpawner : MonoBehaviour {
 
     public GameObject MGE(Vector3 pos, Vector3 target)
     {
-        GameObject tmp = Instantiate(EffectPrefabs[11]);
+        GameObject tmp = Instantiate(EffectPrefabs[11]) as GameObject;
         tmp.transform.SetParent(parent.transform, false);
         tmp.transform.position = new Vector3(pos.x, pos.y, -0.22f);
 

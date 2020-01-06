@@ -115,6 +115,7 @@ public class FruitSpawner : MonoBehaviour {
             RemakeGrid();
             FruitMapCreate(Map);
         }
+        SpawnController.isSpawned = true;
     }
 
     void RemakeGrid()
@@ -172,7 +173,6 @@ public class FruitSpawner : MonoBehaviour {
         else
             r = Random.Range(0, 7);
 
-        Debug.Log(r);
 
         FruitScript.Render.sprite = FruitSprite[r];
         FruitScript.Fruit.FruitPosition = new Vector2(x, y);
@@ -200,10 +200,38 @@ public class FruitSpawner : MonoBehaviour {
         return ObjTmp;
     }
 
-    public GameObject SpawnFruitPower(int type, int power, Vector2 pos)
+    public GameObject SpawnFruitPower(int type, int power, Vector3 pos)
     {
+        GameObject tmp;
+        int x = (int)pos.x;
+        int y = (int)pos.y;
+        if (FruitGrid[x, y] != null)
+            Destroy(FruitGrid[x, y]);
+        if (type == 8)
+        {
+            tmp = Instantiate(FruitColor) as GameObject;
+        }
+        else
+        {
+            tmp = Instantiate(FruitObject) as GameObject;
+        }
+        FruitScript = tmp.GetComponent<FruitObj>();
+        FruitScript.Render.enabled = true;
+        tmp.transform.SetParent(FruitParent.transform, false);
+        tmp.transform.localPosition = new Vector3(x, y, pos.z);
+        FruitGrid[x, y] = tmp;
+        FruitGridScript[x, y] = FruitScript;
+        if (type != 8)
+            FruitScript.Render.sprite = FruitSprite[type];
+        FruitScript.Fruit.FruitPosition = new Vector2(x, y);
+        FruitScript.Fruit.FruitType = type;
+        FruitScript.Fruit.FruitPower = power;
+        tmp.GetComponent<Collider2D>().enabled = false;
+        if (power == (int)GameController.Power.BOOM)
+            EffectSpawner.effect.Enchant(tmp.transform.GetChild(0).gameObject);
 
-        return null;
+
+        return tmp;
     }
 
     GameObject G_FruitInstaniate(int x, int y)

@@ -13,10 +13,13 @@ public class SpawnController : MonoBehaviour {
 
     public float DELAY;
 
+    public static bool isSpawned = false;
+
+
     private void Update()
     {
         DELAY -= Time.deltaTime;
-        if (DELAY < 0)
+        if (DELAY < 0 && isSpawned)
         {
             StartCoroutine(DropAndSpawn());
             this.enabled = false;
@@ -25,6 +28,7 @@ public class SpawnController : MonoBehaviour {
 
     IEnumerator DropAndSpawn()
     {
+
         Drop();
         yield return new WaitForEndOfFrame();
         Spawn();

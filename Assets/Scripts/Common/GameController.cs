@@ -14,7 +14,7 @@ public class GameController : MonoBehaviour {
     public static GameController gameController;
 
     public static float DROP_SPEED = 8;
-    public static float DROP_DELAY = 0.5f;
+    public static float DROP_DELAY = -1f;
 
     [SerializeField]
     private GameObject selector;
@@ -223,22 +223,25 @@ public class GameController : MonoBehaviour {
 
     public void WinChecker()
     {
-        //int Min = 0;
-        //for (int y = 0; y < 9; y++)
-        //{
-        //    Debug.Log(FruitStar.Fruit.FruitPosition);
-        //    if (GridManager.grid.GridCellObj[(int)FruitStar.Fruit.FruitPosition.x, y] != null)
-        //    {
-        //        Min = y;
-        //        break;
-        //    }
+        int Min = 0;
+        for (int y = 0; y < 9; y++)
+        {
+            if (FruitStar == null)
+            {
+                return;
+            }
+            if (GridManager.grid.GridCellObj[(int)FruitStar.Fruit.FruitPosition.x, y] != null)
+            {
+                Min = y;
+                break;
+            }
 
-        //    if ((int)FruitStar.Fruit.FruitPosition.y == Min)
-        //    {
-        //        Timer.timer.Win();
-        //        Destroy(FruitStar.gameObject);
-        //    }
-        //}
+            if ((int)FruitStar.Fruit.FruitPosition.y == Min)
+            {
+                Timer.timer.Win();
+                Destroy(FruitStar.gameObject);
+            }
+        }
     }
 
     void EnableSelector(Vector3 pos)
@@ -261,7 +264,6 @@ public class GameController : MonoBehaviour {
         int c1 = list1.Count;
         int c2 = list2.Count;
 
-        Debug.Log("c1 is " + c1 + "c2 is " + c2);
 
         if (c1 > 2)
         {
@@ -479,6 +481,8 @@ public class GameController : MonoBehaviour {
     /// </summary>
     void dropFruit()
     {
+        if (DROP_DELAY < 0)
+            DROP_DELAY = 0.5f;
         Drop.DELAY = DROP_DELAY;
         Drop.enabled = true;
     }
@@ -696,9 +700,9 @@ public class GameController : MonoBehaviour {
     IEnumerator SpawnFruitPower(int type, int power, Vector2 pos)
     {
         yield return new WaitForSeconds(0.4f);
-        //GameObject tmp = FruitSpawner.spawn.SpawnFruitPower(type, power, pos);
-        //yield return new WaitForSeconds(0.2f);
-        //tmp.GetComponent<Collider2D>().enabled = true;
+        GameObject tmp = FruitSpawner.spawn.SpawnFruitPower(type, power, pos);
+        yield return new WaitForSeconds(0.2f);
+        tmp.GetComponent<Collider2D>().enabled = true;
     }
 
 
